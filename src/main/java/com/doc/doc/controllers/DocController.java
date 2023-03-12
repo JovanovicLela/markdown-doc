@@ -19,7 +19,7 @@ public class DocController {
     @Autowired
     DocService docService;
 
-    @PostMapping
+    @PostMapping("/create")
     public DocDTO createDocument(@RequestBody DocDTO docDTO) {
 
         docService.createDocument(docDTO);
