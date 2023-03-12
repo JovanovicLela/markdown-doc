@@ -1,6 +1,7 @@
 package com.doc.doc.services;
 
 import com.doc.doc.dtos.DocDTO;
+import com.doc.doc.exceptions.UserNotAllowedException;
 
 import java.util.List;
 
@@ -13,5 +14,5 @@ public interface DocService {
 
     List<DocDTO> getRecentDocuments();
 
-    void updateDocument(DocDTO docDTO, String userId);
+    void updateDocument(DocDTO docDTO, String userId) throws UserNotAllowedException;
 }
