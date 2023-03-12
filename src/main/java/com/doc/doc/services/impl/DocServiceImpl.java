@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Objects.isNull;
@@ -41,7 +42,11 @@ public class DocServiceImpl implements DocService {
 
     @Override
     public List<DocDTO> getDocumentsForUserId(String userId) {
-        return null;
+
+        final List<DocModel> allByUserId = docDAO.findAllByUserIdOrderByDateUpdatedDesc(userId);
+
+        return allByUserId.stream().map(docModel -> modelMapper.map(docModel, DocDTO.class)).collect(Collectors.toList());
+
     }
 
     @Override

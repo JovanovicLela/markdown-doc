@@ -1,14 +1,18 @@
 package com.doc.doc.controllers;
 
+import com.doc.doc.daos.DocDAO;
 import com.doc.doc.dtos.DocDTO;
+import com.doc.doc.models.DocModel;
 import com.doc.doc.services.DocService;
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -18,6 +22,8 @@ public class DocController {
 
     @Autowired
     DocService docService;
+    @Autowired
+    private DocDAO docDAO;
 
     @PostMapping("/create")
     public DocDTO createDocument(@RequestBody DocDTO docDTO) {
