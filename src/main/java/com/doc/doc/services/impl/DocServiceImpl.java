@@ -12,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import javax.print.Doc;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -48,21 +47,37 @@ public class DocServiceImpl implements DocService {
     }
 
     @Override
-    public List<DocDTO> getDocumentsForUserId(String userId) {
+    public List<DocDTO> getDocumentsForUserId(String userId, String userId1) {
 
         final List<DocModel> allByUserId = docDAO.findAllByUserIdOrderByDateUpdatedDesc(userId);
 
-        return allByUserId.stream().map(docModel -> modelMapper.map(docModel, DocDTO.class)).collect(Collectors.toList());
+        if (userId.equals(userId1)) {
+            return allByUserId.stream().map(docModel -> modelMapper.map(docModel, DocDTO.class)).collect(Collectors.toList());
+        } else {
+            return allByUserId.stream().filter(DocModel::getAvailable)
+                    .map(docModel -> modelMapper.map(docModel, DocDTO.class)).collect(Collectors.toList());
+
+        }
 
     }
 
     @Override
-    public DocDTO getDocument(String docId) {
+    public DocDTO getDocument(String docId, String userId) {
 
         final Optional<DocModel> optionalDocModel = docDAO.findById(docId);
 
         if (optionalDocModel.isPresent()) {
-            return modelMapper.map(optionalDocModel, DocDTO.class);
+
+            if (optionalDocModel.get().getUserId().equals(userId)) {
+                return modelMapper.map(optionalDocModel, DocDTO.class);
+
+            } else {
+                if (optionalDocModel.get().getAvailable()) {
+                    return modelMapper.map(optionalDocModel, DocDTO.class);
+                }
+            }
+
+            return null;
         }
         return null;
     }

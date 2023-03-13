@@ -37,17 +37,23 @@ public class DocController {
 
     // get all documents for a specific user
     @GetMapping("/{userId}/all")
-    public List<DocDTO> getUserDocuments(@PathVariable String userId) {
+    public List<DocDTO> getUserDocuments(@PathVariable String userId, HttpServletRequest httpServletRequest) {
 
-        return docService.getDocumentsForUserId(userId);
+        String jwtToken = getJwtTokenFromHeader(httpServletRequest);
+        String userId1 = tokenService.getUserId(jwtToken);
+
+        return docService.getDocumentsForUserId(userId, userId1);
 
     }
 
     // get a public document
     @GetMapping("/{docId}")
-    public DocDTO getDocument(@PathVariable String docId) {
+    public DocDTO getDocument(@PathVariable String docId, HttpServletRequest httpServletRequest) {
 
-        return docService.getDocument(docId);
+        String jwtToken = getJwtTokenFromHeader(httpServletRequest);
+        String userId = tokenService.getUserId(jwtToken);
+
+        return docService.getDocument(docId, userId);
     }
 
     @GetMapping("/recent")
@@ -61,17 +67,21 @@ public class DocController {
     @PutMapping("/update")
     public DocDTO updateDocument(@RequestBody DocDTO docDTO, HttpServletRequest httpServletRequest) throws UserNotAllowedException {
 
-        String tokenHeader = httpServletRequest.getHeader(AUTHORIZATION);
-
-        String jwtToken = StringUtils.removeStart(tokenHeader, "Bearer ").trim();
+        String jwtToken = getJwtTokenFromHeader(httpServletRequest);
 
         // TODO: extract userId from token
         //String userId = "scnsjcnsjncdjscnjsnjccsdc";  // userId --> issuer on jwtToken
 
         String userId = tokenService.getUserId(jwtToken);
-
         docService.updateDocument(docDTO, userId);
+
         return docDTO;
+    }
+
+    private String getJwtTokenFromHeader(HttpServletRequest httpServletRequest) {
+        String tokenHeader = httpServletRequest.getHeader(AUTHORIZATION);
+        String jwtToken = StringUtils.removeStart(tokenHeader, "Bearer ").trim();
+        return jwtToken;
     }
 
 }
