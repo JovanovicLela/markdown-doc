@@ -84,7 +84,10 @@ public class DocServiceImpl implements DocService {
 
             final DocModel docModel = optionalDocModel.get();
             if (docModel.getUserId().equals(userId)) {
-
+                modelMapper.map(docDTO, docModel);
+                docDAO.save(docModel);
+                modelMapper.map(docModel, docDTO);
+                return;
             } else {
                 throw new UserNotAllowedException("You are not allowed to modify this document");
             }

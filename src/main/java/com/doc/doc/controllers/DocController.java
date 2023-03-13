@@ -2,8 +2,10 @@ package com.doc.doc.controllers;
 
 import com.doc.doc.daos.DocDAO;
 import com.doc.doc.dtos.DocDTO;
+import com.doc.doc.exceptions.UserNotAllowedException;
 import com.doc.doc.models.DocModel;
 import com.doc.doc.services.DocService;
+import com.doc.doc.services.TokenService;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +24,9 @@ public class DocController {
 
     @Autowired
     DocService docService;
+
     @Autowired
-    private DocDAO docDAO;
+    TokenService tokenService;
 
     @PostMapping("/create")
     public DocDTO createDocument(@RequestBody DocDTO docDTO) {
@@ -56,14 +59,16 @@ public class DocController {
 
     // modify his own doocuments
     @PutMapping("/update")
-    public DocDTO updateDocument(@RequestBody DocDTO docDTO, HttpServletRequest httpServletRequest) {
+    public DocDTO updateDocument(@RequestBody DocDTO docDTO, HttpServletRequest httpServletRequest) throws UserNotAllowedException {
 
         String tokenHeader = httpServletRequest.getHeader(AUTHORIZATION);
 
         String jwtToken = StringUtils.removeStart(tokenHeader, "Bearer ").trim();
 
         // TODO: extract userId from token
-        String userId = "";  // userId --> issuer on jwtToken
+        //String userId = "scnsjcnsjncdjscnjsnjccsdc";  // userId --> issuer on jwtToken
+
+        String userId = tokenService.getUserId(jwtToken);
 
         docService.updateDocument(docDTO, userId);
         return docDTO;
