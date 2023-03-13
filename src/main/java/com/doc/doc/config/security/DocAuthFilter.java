@@ -1,9 +1,11 @@
 package com.doc.doc.config.security;
 
 import com.google.common.net.HttpHeaders;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -12,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
 
@@ -31,7 +34,7 @@ public class DocAuthFilter extends AbstractAuthenticationProcessingFilter {
         String tokenUnstripped= request.getHeader(HttpHeaders.AUTHORIZATION);
 
         String token;
-        token = tokenUnstripped.split("\\s")[1];
+        token = StringUtils.removeStart(Optional.ofNullable(tokenUnstripped).orElse(""), "Bearer").trim();
 
         Authentication authentication;
         if (isEmpty(token)) {
@@ -43,9 +46,11 @@ public class DocAuthFilter extends AbstractAuthenticationProcessingFilter {
         return getAuthenticationManager().authenticate(authentication);
     }
 
+    // !!!
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        super.successfulAuthentication(request, response, chain, authResult);
+        SecurityContextHolder.getContext().setAuthentication(authResult);
+        chain.doFilter(request, response);
     }
 
     @Override

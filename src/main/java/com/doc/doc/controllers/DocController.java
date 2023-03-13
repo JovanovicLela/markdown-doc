@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +30,7 @@ public class DocController {
     TokenService tokenService;
 
     @PostMapping("/create")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public DocDTO createDocument(@RequestBody DocDTO docDTO) {
 
         docService.createDocument(docDTO);
@@ -37,6 +39,7 @@ public class DocController {
 
     // get all documents for a specific user
     @GetMapping("/{userId}/all")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public List<DocDTO> getUserDocuments(@PathVariable String userId, HttpServletRequest httpServletRequest) {
 
         String jwtToken = getJwtTokenFromHeader(httpServletRequest);
@@ -48,6 +51,7 @@ public class DocController {
 
     // get a public document
     @GetMapping("/{docId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'ANONYMOUS')")
     public DocDTO getDocument(@PathVariable String docId, HttpServletRequest httpServletRequest) {
 
         String jwtToken = getJwtTokenFromHeader(httpServletRequest);
@@ -57,19 +61,20 @@ public class DocController {
     }
 
     @GetMapping("/recent")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'ANONYMOUS')")
     public List<DocDTO> getRecentDocuments() {
 
         return docService.getRecentDocuments();
-
     }
 
     // modify his own doocuments
     @PutMapping("/update")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public DocDTO updateDocument(@RequestBody DocDTO docDTO, HttpServletRequest httpServletRequest) throws UserNotAllowedException {
 
         String jwtToken = getJwtTokenFromHeader(httpServletRequest);
 
-        // TODO: extract userId from token
+        // TODO: extract userId from token  // --- done
         //String userId = "scnsjcnsjncdjscnjsnjccsdc";  // userId --> issuer on jwtToken
 
         String userId = tokenService.getUserId(jwtToken);
@@ -79,9 +84,17 @@ public class DocController {
     }
 
     private String getJwtTokenFromHeader(HttpServletRequest httpServletRequest) {
-        String tokenHeader = httpServletRequest.getHeader(AUTHORIZATION);
-        String jwtToken = StringUtils.removeStart(tokenHeader, "Bearer ").trim();
-        return jwtToken;
+
+        try {
+            String tokenHeader = httpServletRequest.getHeader(AUTHORIZATION);
+            String jwtToken = StringUtils.removeStart(tokenHeader, "Bearer ").trim();
+            return jwtToken;
+
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return StringUtils.EMPTY;
+        }
+
     }
 
 }
