@@ -39,7 +39,7 @@ public class DocController {
 
     // get all documents for a specific user
     @GetMapping("/{userId}/all")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('ANONYMOUS', 'USER', 'ADMIN')")
     public List<DocDTO> getUserDocuments(@PathVariable String userId, HttpServletRequest httpServletRequest) {
 
         String jwtToken = getJwtTokenFromHeader(httpServletRequest);
