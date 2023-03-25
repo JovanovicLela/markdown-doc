@@ -38,7 +38,7 @@ public class DocController {
     }
 
     // get all documents for a specific user
-    @GetMapping("/{userId}/all")
+    @GetMapping("/all/{userId}")
     @PreAuthorize("hasAnyRole('ANONYMOUS', 'USER', 'ADMIN')")
     public List<DocDTO> getUserDocuments(@PathVariable String userId, HttpServletRequest httpServletRequest) {
 
@@ -50,7 +50,7 @@ public class DocController {
     }
 
     // get a public document
-    @GetMapping("/{docId}")
+    @GetMapping("/get/{docId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'ANONYMOUS')")
     public DocDTO getDocument(@PathVariable String docId, HttpServletRequest httpServletRequest) {
 
