@@ -69,11 +69,11 @@ public class DocServiceImpl implements DocService {
         if (optionalDocModel.isPresent()) {
 
             if (optionalDocModel.get().getUserId().equals(userId)) {
-                return modelMapper.map(optionalDocModel, DocDTO.class);
+                return modelMapper.map(optionalDocModel.get(), DocDTO.class);
 
             } else {
                 if (optionalDocModel.get().getAvailable()) {
-                    return modelMapper.map(optionalDocModel, DocDTO.class);
+                    return modelMapper.map(optionalDocModel.get(), DocDTO.class);
                 }
             }
 
