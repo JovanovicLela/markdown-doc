@@ -27,7 +27,7 @@ public class TokenServiceImpl implements TokenService {
         JSONObject claimsJson = new JSONObject(claims);
 
         //issuer
-        return (String)claimsJson.get("iss");
+        return claimsJson.getString("iss");
     }
 
     @Override

@@ -86,13 +86,17 @@ public class DocServiceImpl implements DocService {
     public List<DocDTO> getRecentDocuments() {
 
        // final Page<DocModel> docModelsUpdatedAt = docDAO.findAll(PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "dateUpdated")));
-        final Page<DocModel> docModelsUpdatedAt = docDAO.findByAvailable(true, PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "dateUpdated")));
+        final Page<DocModel> docModelsUpdatedAt = docDAO.findByAvailable(true, PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "dateUpdated")));
 
         return docModelsUpdatedAt.stream().map(docModel -> modelMapper.map(docModel, DocDTO.class)).collect(Collectors.toList());
     }
 
     @Override
     public void updateDocument(DocDTO docDTO, String userId) throws UserNotAllowedException {
+
+        checkNotNull(docDTO.getContent());
+        checkNotNull(docDTO.getTitle());
+        checkNotNull(docDTO.getUserId());
 
         final Optional<DocModel> optionalDocModel = docDAO.findById(docDTO.getId());
 
